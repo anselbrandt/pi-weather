@@ -26,6 +26,9 @@ async function main() {
   const rain = current.condition.toLowerCase().split(" ").includes("rain")
     ? true
     : false;
+  const snow = current.condition.toLowerCase().split(" ").includes("snow")
+    ? true
+    : false;
   const temp = parseFloat(
     current.temperature.replace(/\s/g, "").replace("&deg;C", "")
   );
@@ -33,7 +36,7 @@ async function main() {
   const humidity = parseFloat(
     current.humidity.replace(/\s/g, "").replace("%", "")
   );
-  console.log(rain, temp, humidity);
+  console.log(snow,rain, temp, humidity);
 }
 
 main().catch((error) => console.error(error));
