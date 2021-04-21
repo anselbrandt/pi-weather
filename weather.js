@@ -404,6 +404,9 @@ async function getWeather() {
   const rain = current.condition.toLowerCase().split(" ").includes("rain")
     ? true
     : false;
+  const snow = current.condition.toLowerCase().split(" ").includes("snow")
+    ? true
+    : false;
   const temp = parseFloat(
     current.temperature.replace(/\s/g, "").replace("&deg;C", "")
   );
@@ -411,7 +414,7 @@ async function getWeather() {
   const humidity = parseFloat(
     current.humidity.replace(/\s/g, "").replace("%", "")
   );
-  return { rain, temp };
+  return { snow, rain, temp };
 }
 
 async function main() {
