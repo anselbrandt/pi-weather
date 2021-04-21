@@ -407,14 +407,32 @@ async function getWeather() {
   const snow = current.condition.toLowerCase().split(" ").includes("snow")
     ? true
     : false;
-  const temp = parseFloat(
-    current.temperature.replace(/\s/g, "").replace("&deg;C", "")
-  );
-
-  const humidity = parseFloat(
-    current.humidity.replace(/\s/g, "").replace("%", "")
-  );
-  return { snow, rain, temp };
+  const temp = current.temperature.replace(/\s/g, "").replace("&deg;C", "");
+  const pressure = current.pressuretendency
+    .split(" ")
+    .map((val) => parseFloat(val))
+    .filter((val) => !isNaN(val))[0]
+    .toFixed(1);
+  const isFalling = current.pressuretendency.split(" ").includes("falling");
+  const isRising = current.pressuretendency.split(" ").includes("rising");
+  const humidity = current.humidity.replace(/\s/g, "").replace("%", "");
+  const windchill = current.windchill.replace(/\s/g, "");
+  const wind = current.wind
+    .split(" ")
+    .map((val) => parseInt(val))
+    .filter((val) => !isNaN(val))[0]
+    .toString();
+  return {
+    snow,
+    rain,
+    temp,
+    pressure,
+    isFalling,
+    isRising,
+    humidity,
+    windchill,
+    wind,
+  };
 }
 
 async function main() {
