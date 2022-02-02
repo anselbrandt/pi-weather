@@ -474,7 +474,7 @@ async function main() {
       isNeg,
       isDec,
       firstDig: parseInt(firstDig),
-      secondDig: parseInt(secondDig),
+      secondDig: secondDig ? parseInt(secondDig) : 0,
     };
   };
 
