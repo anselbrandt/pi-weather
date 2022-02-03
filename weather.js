@@ -451,7 +451,7 @@ async function main() {
     return {
       isRain,
       isNeg,
-      isDec: !secondDig ? true : false,
+      isDec,
       firstDig: parseInt(firstDig),
       secondDig: secondDig ? parseInt(secondDig) : 0,
     };
