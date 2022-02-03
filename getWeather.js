@@ -39,7 +39,7 @@ async function getWeather() {
   const isFalling = current.pressuretendency.split(" ").includes("falling");
   const isRising = current.pressuretendency.split(" ").includes("rising");
   const humidity = current.humidity.replace(/\s/g, "").replace("%", "");
-  // const windchill = current.windchill.replace(/\s/g, "");
+  const windchill = (temp < 0) ? current.windchill.replace(/\s/g, "") : temp;
   const wind = current.wind
     .split(" ")
     .map((val) => parseInt(val))
@@ -53,7 +53,7 @@ async function getWeather() {
     isFalling,
     isRising,
     humidity,
-    // windchill,
+    windchill,
     wind,
   };
 }
