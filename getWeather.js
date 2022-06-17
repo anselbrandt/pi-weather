@@ -10,6 +10,7 @@ const url = `https://weather.gc.ca/rss/city/${city}_${lang}.xml`;
 async function getWeather() {
   const response = await fetch(url);
   const xml = await response.text();
+  const warning = xml.split('<summary type="html">')[1].split("</summary>")[0];
   const observed = xml
     .split("[CDATA[")[1]
     .split("]]")[0]
@@ -49,6 +50,7 @@ async function getWeather() {
     .filter((val) => !isNaN(val))[0]
     .toString();
   const summary = {
+    warning,
     snow,
     rain,
     temp,
