@@ -32,6 +32,7 @@ async function getWeather() {
     const [key, val] = curr;
     return Object.assign(acc, { [key.trim()]: val.trim() });
   }, {});
+  const condition = current.condition;
   const rain = current.condition.split(" ").includes("rain") ? true : false;
   const snow = current.condition.split(" ").includes("snow") ? true : false;
   const temp = current.temperature;
@@ -51,6 +52,7 @@ async function getWeather() {
     .toString();
   const summary = {
     warning,
+    condition,
     snow,
     rain,
     temp,
