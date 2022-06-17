@@ -2,7 +2,6 @@
 // https://weather.gc.ca/city/pages/qc-147_metric_e.html
 
 const fetch = require("node-fetch");
-const xml2js = require("xml2js").parseStringPromise;
 
 const city = "qc-147";
 const lang = "e";
@@ -10,42 +9,46 @@ const url = `https://weather.gc.ca/rss/city/${city}_${lang}.xml`;
 
 async function getWeather() {
   const response = await fetch(url);
-  const text = await response.text();
-  const data = await xml2js(text);
-  const raw = data.feed.entry[1].summary[0]._;
-  const observed = raw
+  const xml = await response.text();
+  const observed = xml
+    .split("[CDATA[")[1]
+    .split("]]")[0]
     .replace(/<b>/g, "")
-    .replace(/<?\/?b>/g, "")
-    .replace(/<br?\/?>/g, "")
-    .split(/\n/);
-  const current = observed.reduce((acc, curr) => {
-    const [key, value] = curr.split(":");
-    return Object.assign(acc, {
-      [key.replace(/\s/g, "").replace(/\/?/g, "").toLowerCase()]: value,
-    });
-  });
-  const rain = current.condition.toLowerCase().split(" ").includes("rain")
-    ? true
-    : false;
-  const snow = current.condition.toLowerCase().split(" ").includes("snow")
-    ? true
-    : false;
-  const temp = current.temperature.replace(/\s/g, "").replace("&deg;C", "");
-  const pressure = current.pressuretendency
+    .replace(/<\/b>/g, "")
+    .replace(/<br\/>/g, "")
+    .replace(/&deg;C/g, "")
+    .replace(/km\/h/g, "")
+    .replace(/km/g, "")
+    .replace(/kPa/g, "")
+    .replace(/%/g, "")
+    .replace(/\/ Tendency/g, "")
+    .trim()
+    .split(/\n/)
+    .map((entry) => entry.trim().toLowerCase());
+  const [_, ...tail] = observed;
+  const entries = tail.map((entry) => entry.split(":"));
+  const current = entries.reduce((acc, curr) => {
+    const [key, val] = curr;
+    return Object.assign(acc, { [key.trim()]: val.trim() });
+  }, {});
+  const rain = current.condition.split(" ").includes("rain") ? true : false;
+  const snow = current.condition.split(" ").includes("snow") ? true : false;
+  const temp = current.temperature;
+  const pressure = current.pressure
     .split(" ")
     .map((val) => parseFloat(val))
     .filter((val) => !isNaN(val))[0]
     .toFixed(1);
-  const isFalling = current.pressuretendency.split(" ").includes("falling");
-  const isRising = current.pressuretendency.split(" ").includes("rising");
-  const humidity = current.humidity.replace(/\s/g, "").replace("%", "");
-  const windchill = (temp < 0) ? current.windchill.replace(/\s/g, "") : temp;
+  const isFalling = current.pressure.split(" ").includes("falling");
+  const isRising = current.pressure.split(" ").includes("rising");
+  const humidity = current.humidity;
+  const windchill = temp < 0 ? current.windchill : temp;
   const wind = current.wind
     .split(" ")
     .map((val) => parseInt(val))
     .filter((val) => !isNaN(val))[0]
     .toString();
-  return {
+  const summary = {
     snow,
     rain,
     temp,
@@ -56,6 +59,7 @@ async function getWeather() {
     windchill,
     wind,
   };
+  return summary;
 }
 
 async function main() {
