@@ -11,6 +11,8 @@ async function getWeather() {
   const response = await fetch(url);
   const xml = await response.text();
   const warning = xml.split('<summary type="html">')[1].split("</summary>")[0];
+  const isWarning =
+    warning !== "No watches or warnings in effect." ? true : false;
   const observed = xml
     .split("[CDATA[")[1]
     .split("]]")[0]
@@ -52,6 +54,7 @@ async function getWeather() {
     .toString();
   const summary = {
     warning,
+    isWarning,
     condition,
     snow,
     rain,
