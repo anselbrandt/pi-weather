@@ -41,16 +41,10 @@ async function getWeather() {
     .replace(/%/g, "")
     .replace(/\/ Tendency/g, "")
     .trim()
-    .split(/\n/)
-    .map((entry) => entry.trim().toLowerCase());
-  const [_, ...tail] = observed;
-  const entries = tail.map((entry) => entry.split(":"));
-  const current = entries.reduce((acc, curr) => {
-    const [key, val] = curr;
-    return Object.assign(acc, { [key.trim()]: val.trim() });
-  }, {});
-  const rain = current.condition.split(" ").includes("rain") ? true : false;
-  const temp = current.temperature;
+    .split(":")
+    .map((entry) => entry.trim().toLowerCase()).slice(3,5)
+  const rain = observed[0].split(" ").includes("rain") ? true : false;
+  const temp = observed[1].split(' ')[0]
 
   return { rain, temp };
 }
