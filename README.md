@@ -23,18 +23,18 @@ Restarts every minute (of every hour of every day of every month and every day o
 ```
 
 ```
-                Start and Daemonize any application:
-                $ pm2 start app.js
+Start and Daemonize any application:
+$ pm2 start app.js
 
-                Load Balance 4 instances of api.js:
-                $ pm2 start api.js -i 4
+Load Balance 4 instances of api.js:
+$ pm2 start api.js -i 4
 
-                Monitor in production:
-                $ pm2 monitor
+Monitor in production:
+$ pm2 monitor
 
-                Make pm2 auto-boot at server restart:
-                $ pm2 startup
+Make pm2 auto-boot at server restart:
+$ pm2 startup
 
-                To go further checkout:
-                http://pm2.io/
+To go further checkout:
+http://pm2.io/
 ```
