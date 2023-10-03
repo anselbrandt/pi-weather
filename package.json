@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "node-fetch": "^2.7.0",
+    "ec-weather": "^1.0.6",
     "sense-hat-led": "^1.2.0"
   }
 }

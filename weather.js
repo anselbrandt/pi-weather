@@ -1,6 +1,6 @@
 // https://weather.gc.ca/rss/city/qc-147_e.xml
 
-const fetch = require("node-fetch");
+const ecweather = require("ec-weather");
 const sense = require("sense-hat-led");
 
 const X = [64, 64, 64]; // white
@@ -21,32 +21,26 @@ const num = [
 [X,X,X,O,O,O,O,O,X,O,X,O,O,O,O,O,X,X,X,O,O,O,O,O,O,O,X,O,O,O,O,O,X,X,X,],
 ];
 
-const city = "qc-147";
-const lang = "e";
-const url = `https://weather.gc.ca/rss/city/${city}_${lang}.xml`;
+// const city = "qc-147";
+// const lang = "e";
+// const url = `https://weather.gc.ca/rss/city/${city}_${lang}.xml`;
 
 async function getWeather() {
-  const response = await fetch(url);
-  const xml = await response.text();
-  const observed = xml
-    .split("[CDATA[")[1]
-    .split("]]")[0]
-    .replace(/<b>/g, "")
-    .replace(/<\/b>/g, "")
-    .replace(/<br\/>/g, "")
-    .replace(/&deg;C/g, "")
-    .replace(/km\/h/g, "")
-    .replace(/km/g, "")
-    .replace(/kPa/g, "")
-    .replace(/%/g, "")
-    .replace(/\/ Tendency/g, "")
-    .trim()
-    .split(":")
-    .map((entry) => entry.trim().toLowerCase()).slice(3,5)
-  const rain = observed[0].split(" ").includes("rain") ? true : false;
-  const temp = observed[1].split(' ')[0]
+  const options = {
+    lang: "en",
+    city: "qc-147",
+  };
+  const response = await ecweather(options);
+  const current = response.entries.filter(
+    (entry) => entry.type === "Current Conditions"
+  )[0];
+  const temp = current.temperature.replace("°C", "");
+  const rain = current.condition.toLowerCase().includes("rain") ? true : false;
 
-  return { rain, temp };
+  return {
+    rain,
+    temp: parseFloat(temp),
+  };
 }
 
 async function main() {
