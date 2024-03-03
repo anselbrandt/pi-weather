@@ -72,7 +72,7 @@ async function main() {
   const getDisplay = (options) => {
     const isRain = options.rain;
     const isNeg = options.temp < 0;
-    const tempStr = options.temp.toString().replace("-", "");
+    const tempStr = options.temp.toFixed(1).replace("-", "");
     const whole = tempStr.split(".");
     const isDec = tempStr.includes(".") && whole[0].length === 1;
     const firstDig = whole[0] > 1 ? whole[0][0] : whole[0];
