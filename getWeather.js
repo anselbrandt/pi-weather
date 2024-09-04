@@ -14,14 +14,14 @@
 }
 */
 
-const ecweather = require("ec-weather");
+import meteoWeather from "./meteo-weather/index.js";
 
 async function getWeather() {
   const options = {
     lang: "en",
     city: "qc-147",
   };
-  const response = await ecweather(options);
+  const response = await meteoWeather(options);
   const current = response.entries.filter(
     (entry) => entry.type === "Current Conditions"
   )[0];
