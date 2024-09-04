@@ -1,7 +1,7 @@
 // https://weather.gc.ca/rss/city/qc-147_e.xml
 
 import meteoWeather from "./meteo-weather/index.js";
-import * as  sense from "./node_modules/sense-hat-led/index.js"
+import sense from "./node_modules/sense-hat-led/index.js"
 
 const X = [64, 64, 64]; // white
 const O = [0, 0, 0]; // black
