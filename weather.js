@@ -1,7 +1,7 @@
 // https://weather.gc.ca/rss/city/qc-147_e.xml
 
-const ecweather = require("ec-weather");
-const sense = require("sense-hat-led");
+import meteoWeather from "./meteo-weather/index.js";
+import * as  sense from "sense-hat-led"
 
 const X = [64, 64, 64]; // white
 const O = [0, 0, 0]; // black
@@ -9,16 +9,16 @@ const B = [0, 0, 64]; // blue
 
 // prettier-ignore
 const num = [
-[X,X,X,O,O,O,O,O,X,O,X,O,O,O,O,O,X,O,X,O,O,O,O,O,X,O,X,O,O,O,O,O,X,X,X,],
-[O,O,X,O,O,O,O,O,O,O,X,O,O,O,O,O,O,O,X,O,O,O,O,O,O,O,X,O,O,O,O,O,O,O,X,],
-[X,X,X,O,O,O,O,O,O,O,X,O,O,O,O,O,X,X,X,O,O,O,O,O,X,O,O,O,O,O,O,O,X,X,X,],
-[X,X,X,O,O,O,O,O,O,O,X,O,O,O,O,O,X,X,X,O,O,O,O,O,O,O,X,O,O,O,O,O,X,X,X,],
-[X,O,X,O,O,O,O,O,X,O,X,O,O,O,O,O,X,X,X,O,O,O,O,O,O,O,X,O,O,O,O,O,O,O,X,],
-[X,X,X,O,O,O,O,O,X,O,O,O,O,O,O,O,X,X,X,O,O,O,O,O,O,O,X,O,O,O,O,O,X,X,X,],
-[X,X,X,O,O,O,O,O,X,O,O,O,O,O,O,O,X,X,X,O,O,O,O,O,X,O,X,O,O,O,O,O,X,X,X,],
-[X,X,X,O,O,O,O,O,O,O,X,O,O,O,O,O,O,O,X,O,O,O,O,O,O,O,X,O,O,O,O,O,O,O,X,],
-[X,X,X,O,O,O,O,O,X,O,X,O,O,O,O,O,X,X,X,O,O,O,O,O,X,O,X,O,O,O,O,O,X,X,X,],
-[X,X,X,O,O,O,O,O,X,O,X,O,O,O,O,O,X,X,X,O,O,O,O,O,O,O,X,O,O,O,O,O,X,X,X,],
+  [X, X, X, O, O, O, O, O, X, O, X, O, O, O, O, O, X, O, X, O, O, O, O, O, X, O, X, O, O, O, O, O, X, X, X,],
+  [O, O, X, O, O, O, O, O, O, O, X, O, O, O, O, O, O, O, X, O, O, O, O, O, O, O, X, O, O, O, O, O, O, O, X,],
+  [X, X, X, O, O, O, O, O, O, O, X, O, O, O, O, O, X, X, X, O, O, O, O, O, X, O, O, O, O, O, O, O, X, X, X,],
+  [X, X, X, O, O, O, O, O, O, O, X, O, O, O, O, O, X, X, X, O, O, O, O, O, O, O, X, O, O, O, O, O, X, X, X,],
+  [X, O, X, O, O, O, O, O, X, O, X, O, O, O, O, O, X, X, X, O, O, O, O, O, O, O, X, O, O, O, O, O, O, O, X,],
+  [X, X, X, O, O, O, O, O, X, O, O, O, O, O, O, O, X, X, X, O, O, O, O, O, O, O, X, O, O, O, O, O, X, X, X,],
+  [X, X, X, O, O, O, O, O, X, O, O, O, O, O, O, O, X, X, X, O, O, O, O, O, X, O, X, O, O, O, O, O, X, X, X,],
+  [X, X, X, O, O, O, O, O, O, O, X, O, O, O, O, O, O, O, X, O, O, O, O, O, O, O, X, O, O, O, O, O, O, O, X,],
+  [X, X, X, O, O, O, O, O, X, O, X, O, O, O, O, O, X, X, X, O, O, O, O, O, X, O, X, O, O, O, O, O, X, X, X,],
+  [X, X, X, O, O, O, O, O, X, O, X, O, O, O, O, O, X, X, X, O, O, O, O, O, O, O, X, O, O, O, O, O, X, X, X,],
 ];
 
 // const city = "qc-147";
@@ -30,7 +30,7 @@ async function getWeather() {
     lang: "en",
     city: "qc-147",
   };
-  const response = await ecweather(options);
+  const response = await meteoWeather(options);
   const current = response.entries.filter(
     (entry) => entry.type === "Current Conditions"
   )[0];
