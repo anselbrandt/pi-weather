@@ -1,5 +1,5 @@
-import { fromString } from "html-to-text/lib/html-to-text.js";
-import camelCase from "camel-case";
+import { convert } from "html-to-text";
+import * as changeCase from "change-case"
 
 /** * Builder for watches and warnings
  * - add a boolean to indicate whether a warning or watch is currently in effect.
@@ -21,11 +21,13 @@ function ccBuilder(item) {
   const readings = item.summary.split("\n");
 
   readings.forEach((reading) => {
-    const parts = reading.split(/:(.+)/);
-    const key = camelCase(parts[0].trim().replace("/", "_"));
-    const val = parts[1].trim();
+    if (reading.includes(':')) {
+      const parts = reading.split(/:(.+)/);
+      const key = changeCase.camelCase(parts[0].trim().replace("/", "_"));
+      const val = parts[1].trim();
 
-    newItem[key] = val;
+      newItem[key] = val;
+    }
   });
 
   newItem.summary = item.summary.replace(new RegExp("\\s?\\n", "gm"), " | ");
@@ -73,7 +75,7 @@ export function transform(lang, city, feed) {
       link: item.link.href,
       updated: item.updated,
       published: item.published,
-      summary: fromString(item.summary._, { wordwrap: null }),
+      summary: convert(item.summary._, { wordwrap: null }),
     };
 
     switch (obj.type) {

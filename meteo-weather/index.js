@@ -1,6 +1,6 @@
 import { parse } from "./parse.js";
 import { transform } from "./transform.js";
-import axios from "axios";
+import fetch from "node-fetch";
 
 /**
  * Retrieve forecast for specified city / language and return parsed result.
@@ -21,13 +21,15 @@ export default async function meteoWeather(options = {}) {
     .toLowerCase()}.xml`;
 
   try {
-    let data = await axios.get(url);
+    const res = await fetch(url);
 
-    // convert to JSON
-    data = await parse(data.data);
+    // convert to text
+    const text = await res.text();
+
+    const parsed = await parse(text)
 
     // apply transformations
-    data = transform(lang, city, data);
+    const data = transform(lang, city, parsed);
 
     // return result
     return data;
