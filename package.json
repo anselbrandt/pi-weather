@@ -5,9 +5,7 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "change-case": "^5.4.4",
-    "html-to-text": "^9.0.5",
-    "node-fetch": "^3.3.2",
+"node-fetch": "^3.3.2",
     "sense-hat-led": "^1.2.0",
     "xml2js": "^0.6.2"
   }

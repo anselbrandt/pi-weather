@@ -1,120 +1,52 @@
-import { convert } from "html-to-text";
-import * as changeCase from "change-case"
-
-/** * Builder for watches and warnings
- * - add a boolean to indicate whether a warning or watch is currently in effect.
- */
-function wwBuilder(item) {
-  const newItem = Object.assign({}, item);
-
-  newItem.inEffect =
-    item.title.indexOf("No watches or warnings in effect") === -1 &&
-    item.title.indexOf("Aucune veille ou alerte en vigueur") === -1;
-  return newItem;
-}
-
-/** * Builder for current conditions
- * - parse summary and add key/value pair to the object for every measurement found.
- */
-function ccBuilder(item) {
-  const newItem = Object.assign({}, item);
-  const readings = item.summary.split("\n");
-
-  readings.forEach((reading) => {
-    if (reading.includes(':')) {
-      const parts = reading.split(/:(.+)/);
-      const key = changeCase.camelCase(parts[0].trim().replace("/", "_"));
-      const val = parts[1].trim();
-
-      newItem[key] = val;
-    }
-  });
-
-  newItem.summary = item.summary.replace(new RegExp("\\s?\\n", "gm"), " | ");
-
-  return newItem;
-}
-
-/** * Builder for weather forecasts
- */
-function wfBuilder(item) {
-  return Object.assign({}, item);
-}
-
-/** * Builder for notices
- */
-function noBuilder(item) {
-  return Object.assign({}, item);
-}
-
-/** * Build Environment Canada city forecast badge URL
- */
-function makeBadgeUrl(lang, city) {
-  return `https://weather.gc.ca/wxlink/wxlink.html?cityCode=${city.toLowerCase()}&lang=${lang
-    .slice(0, 1)
-    .toLowerCase()}`;
-}
-
 /**
- * Apply section-specific data transformations and return the fully
- * assembled, transformed object.
+ * Transform the parsed Environment Canada citypage XML into a
+ * structured object.
  *
- * @param {String} lang - 2 character language code either 'en' or 'fr'
- * @param {String} city - 5 character city code i.e. nb-23
- * @param {object} feed - the object representation of the XML feed
- * @return {Object} Transformed version of the data
+ * @param {String} lang - 'en' or 'fr'
+ * @param {String} city - city code e.g. 's0000635'
+ * @param {object} data - the parsed siteData XML object
+ * @return {Object} Transformed weather data
  */
-export function transform(lang, city, feed) {
-  const data = feed.feed;
+export function transform(lang, city, data) {
+  const site = data.siteData;
+  const cc = site.currentConditions;
 
-  let entries = [];
-  for (const item of data.entry) {
-    const obj = {
-      type: item.category.term,
-      title: item.title,
-      link: item.link.href,
-      updated: item.updated,
-      published: item.published,
-      summary: convert(item.summary._, { wordwrap: null }),
-    };
+  const condition = cc.condition || "";
+  const tempValue = typeof cc.temperature === "object" ? cc.temperature._ : cc.temperature;
+  const tempUnits = typeof cc.temperature === "object" ? cc.temperature.units : "C";
+  const temperature = `${tempValue}°${tempUnits}`;
 
-    switch (obj.type) {
-      case "Warnings and Watches":
-      case "Veilles et avertissements":
-        entries.push(wwBuilder(obj));
-        break;
+  const entries = [
+    {
+      type: "Current Conditions",
+      condition,
+      temperature,
+    },
+  ];
 
-      case "Current Conditions":
-      case "Conditions actuelles":
-        entries.push(ccBuilder(obj));
-        break;
+  // Add forecasts if available
+  if (site.forecastGroup && site.forecastGroup.forecast) {
+    const forecasts = Array.isArray(site.forecastGroup.forecast)
+      ? site.forecastGroup.forecast
+      : [site.forecastGroup.forecast];
 
-      case "Weather Forecasts":
-      case "Prévisions météo":
-        entries.push(wfBuilder(obj));
-        break;
-
-      case "Notice":
-      case "Avis":
-        entries.push(noBuilder(obj));
-        break;
-
-      default:
-        throw Error(`Unrecognized category ${obj.type}.`);
+    for (const fc of forecasts) {
+      entries.push({
+        type: "Weather Forecasts",
+        title: fc.period
+          ? fc.period.textForecastName || fc.period
+          : "",
+        summary: fc.textSummary || "",
+      });
     }
   }
 
   return {
-    // metadata
     lang,
     city,
-    title: data.title,
-    badgeUrl: makeBadgeUrl(lang, city),
-    author: data.author,
-    updated: data.updated,
-    rights: data.rights,
-
-    // each entry has the same template, plus type-specific processing
-    entries: entries,
+    title: site.location
+      ? site.location.name._ || site.location.name
+      : "",
+    entries,
   };
 }

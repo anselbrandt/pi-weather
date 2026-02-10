@@ -1,25 +1,11 @@
-// https://weather.gc.ca/rss/city/qc-147_e.xml
-// https://weather.gc.ca/city/pages/qc-147_metric_e.html
-// const city = "qc-147";
-// const lang = "e";
-// const url = `https://weather.gc.ca/rss/city/${city}_${lang}.xml`;
-
-/*
-{
-  type: "Current Conditions",
-  condition: "Partly Cloudy",
-  temperature: "18.4°C",
-  pressureTendency: "102.0 kPa falling",
-  humidity: "61 %",
-}
-*/
-
 import meteoWeather from "./meteo-weather/index.js";
 
 async function getWeather() {
   const options = {
     lang: "en",
-    city: "qc-147",
+    city: "s0000635",
+    province: "QC",
+    subdir: "00",
   };
   const response = await meteoWeather(options);
   const current = response.entries.filter(

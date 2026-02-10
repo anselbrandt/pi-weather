@@ -1,5 +1,3 @@
-// https://weather.gc.ca/rss/city/qc-147_e.xml
-
 import meteoWeather from "./meteo-weather/index.js";
 import sense from "./node_modules/sense-hat-led/index.js"
 
@@ -21,14 +19,12 @@ const num = [
   [X, X, X, O, O, O, O, O, X, O, X, O, O, O, O, O, X, X, X, O, O, O, O, O, O, O, X, O, O, O, O, O, X, X, X,],
 ];
 
-// const city = "qc-147";
-// const lang = "e";
-// const url = `https://weather.gc.ca/rss/city/${city}_${lang}.xml`;
-
 async function getWeather() {
   const options = {
     lang: "en",
-    city: "qc-147",
+    city: "s0000635",
+    province: "QC",
+    subdir: "00",
   };
   const response = await meteoWeather(options);
   const current = response.entries.filter(
