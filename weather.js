@@ -98,3 +98,4 @@ async function main() {
 }
 
 main().catch((error) => console.error(error));
+setInterval(() => main().catch((error) => console.error(error)), 60000);
