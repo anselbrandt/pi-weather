@@ -25,12 +25,14 @@ async function getWeather() {
   const data = await response.json();
   const observation = data[0].observation;
   const temp = parseFloat(observation.temperature.metricUnrounded);
+  const humidity = parseInt(observation.humidity);
   const condition = observation.condition.toLowerCase();
   const rain = condition.includes("rain");
 
   return {
     rain,
     temp,
+    humidity,
   };
 }
 
@@ -54,6 +56,14 @@ async function main() {
   );
 
   const decIcon = grid.map((val, index) => (index === 44 ? X : O));
+
+  // "%" sign in the 3 free rows below the digits (rows 5-7), centered:
+  //   . . # . . . # .   <- circle (col2) + slash top (col6)
+  //   . . . . # . . .   <- slash middle (col4)
+  //   . . # . . . # .   <- slash bottom (col2) + circle (col6)
+  const percentIcon = grid.map((val, index) =>
+    [42, 46, 52, 58, 62].includes(index) ? X : O
+  );
 
   const merge = (arr1, arr2) =>
     arr1.map((val, index) =>
@@ -91,11 +101,39 @@ async function main() {
     );
   };
 
-  const weather = await getWeather();
-  const display = getDisplay(weather);
-  const pixels = getPixels(display);
-  sense.sync.setPixels(pixels);
+  const getHumidityPixels = (humidity) => {
+    const h = humidity > 99 ? 99 : humidity; // 8x8 fits at most two digits
+    const digits =
+      h >= 10
+        ? merge(firstChar(num[Math.floor(h / 10)]), secondChar(num[h % 10]))
+        : firstChar(num[h]);
+    return merge(digits, percentIcon);
+  };
+
+  let latest = await getWeather();
+
+  const showTemp = () => sense.sync.setPixels(getPixels(getDisplay(latest)));
+  const showHumidity = () =>
+    sense.sync.setPixels(getHumidityPixels(latest.humidity));
+
+  // Refresh the weather data every 60 seconds.
+  setInterval(async () => {
+    try {
+      latest = await getWeather();
+    } catch (error) {
+      console.error(error);
+    }
+  }, 60000);
+
+  // Alternate the display: temperature for 8s, then humidity for 2s, repeating.
+  const cycle = () => {
+    showTemp();
+    setTimeout(() => {
+      showHumidity();
+      setTimeout(cycle, 2000);
+    }, 8000);
+  };
+  cycle();
 }
 
 main().catch((error) => console.error(error));
-setInterval(() => main().catch((error) => console.error(error)), 60000);
