@@ -125,13 +125,13 @@ async function main() {
     }
   }, 60000);
 
-  // Alternate the display: temperature for 8s, then humidity for 2s, repeating.
+  // Alternate the display: temperature for 7s, then humidity for 3s, repeating.
   const cycle = () => {
     showTemp();
     setTimeout(() => {
       showHumidity();
-      setTimeout(cycle, 2000);
-    }, 8000);
+      setTimeout(cycle, 3000);
+    }, 7000);
   };
   cycle();
 }
